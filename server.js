@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose');
 const ejs = require('ejs');
+const passport = require("passport"); 
 
 
 const app = express();
@@ -23,6 +24,12 @@ const db = require('./setup/myurl').mongoURL
 mongoose.connect(db ,{useNewUrlParser:true, useUnifiedTopology:true})
 .then(()=>console.log('MongoDB connected successfully'))
 .catch((err)=>console.log(err));
+
+//Passport middleware
+app.use(passport.initialize());
+
+//config for JWT strategy
+require("./strategies/jsonwtStrategies")(passport);
 
 //server conection
 const port = process.env.PORT || 3000;

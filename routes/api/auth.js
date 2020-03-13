@@ -67,6 +67,26 @@ router.post("/login",(req,res)=>{
       .then(isCorrect =>{
          if(isCorrect){
             res.redirect('profile');
+            //use payload and create token for it
+            const payload = {
+               id : person.id,
+               name : person.name,
+               email : person.email
+            };
+            jsonwt.sign(
+               payload,
+               dbkey.secret,
+               {expiresIn : 3600},
+               (err,token)=>{
+                  if(err) throw err;
+                  else{
+                     console.log({
+                        success : true,
+                        token : "Bearer " + token
+                     });
+                  }
+               }
+            )
             console.log(isCorrect);
          }else{
             console.log(isCorrect);
@@ -78,11 +98,12 @@ router.post("/login",(req,res)=>{
    .catch(err => console.log(err));
 })
 
-//@type POST 
+//@type GET
 //$route /api/auth/profile
-//@desc route for profile
-//@access PUBLIC
-router.get("/profile",(req,res)=>{
-   res.render('profile');
+//@desc route for user profile
+//@access PRIVATE
+router.get("/profile",passport.authenticate('jwt',{session : false}),(req,res)=>{
+   console.log(req);
+   res.send(req.user.profile);
 })
 module.exports = router;
